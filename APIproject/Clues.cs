@@ -1,6 +1,17 @@
 using System.Text.Json.Serialization;
 
-public class Clues
+public class Clues : Category
 {
-    public int MyProperty { get; set; }
+
+    public int CluesLeft { get; set; }
+
+    public Clues()
+    {
+        CluesLeft = CluesAmount;
+    }
+    void ReduceClueCount()
+    {
+        CluesLeft -= CluesLeft;    
+    }
 }
+
