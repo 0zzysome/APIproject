@@ -17,6 +17,7 @@ public class Quiz
 
     [JsonPropertyName("category")]
     public Category Category {get; set;}
-
+    
+    protected Random generator = new();
 }
 
