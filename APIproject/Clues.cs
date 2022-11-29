@@ -7,17 +7,18 @@ public class Clues : Quiz
     // spelaren kan sen välja att reveala en boktav 
     
     public string HiddenHint { get; set; } = "";
-    public int CluesLeft { get; set; }
+    public int CluesLeft { get; set; } = 0;
 
     public Clues(Quiz q)
     {
         
-        CluesLeft = q.Answer.Length;
+        
         for (var i = 0; i < q.Answer.Length; i++)
         {
             if (q.Answer[i] != ' ')
             {
                 HiddenHint += "-";
+                CluesLeft += 1;
             }
             else
             {
@@ -27,16 +28,28 @@ public class Clues : Quiz
         }
         
     }
-    public void RevealLetter(Quiz q)
+    public void RevealLetter(Quiz q, Clues c)
     {
-        char[] ca = HiddenHint.ToArray();
-        int p = generator.Next(q.Answer.Length);
-        ca[p] = q.Answer[p];
-        HiddenHint = ca.ToString();
-        CluesLeft -= CluesLeft;    
+        bool NotRevealed = true;
+        while(NotRevealed)
+        {
+            char[] ca = c.HiddenHint.ToArray();
+            char[] AnswerChar = q.Answer.ToArray();
+            int p = generator.Next(0, q.Answer.Length);
+            if(ca[p]=='-')
+            {
+                ca[p] = AnswerChar[p];
+                c.HiddenHint = string.Join("", ca);
+                c.CluesLeft -= 1; 
+                NotRevealed = false;
+            }
+        }
+        
+        
     }
     public void WriteHidenAnswer()
     {
+        System.Console.WriteLine($"Hints Left: {CluesLeft}");
         System.Console.WriteLine($"Hint of answer: {HiddenHint}");
     }
     

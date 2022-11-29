@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-public class Quiz
+public class Quiz : PointBoard
 {
     
     [JsonPropertyName("question")]
@@ -19,5 +19,13 @@ public class Quiz
     public Category Category {get; set;}
     
     protected Random generator = new();
+
+    public Clues clues;
+
+    public override void AddPoints()
+    {
+        TotalPoints += Difficulty;
+        
+    }
 }
 
