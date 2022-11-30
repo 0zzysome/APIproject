@@ -5,111 +5,129 @@ using System.Net;
 RestClient QuizClient = new("https://jservice.io/api/");
 
 RestRequest QuizRequest = new("random");
-PointBoard board = new PointBoard();
 Quiz q = null;
-
-while (q == null)
-{
-
-    RestResponse QuizResponse = QuizClient.GetAsync(QuizRequest).Result;
-
-    if (QuizResponse.StatusCode == HttpStatusCode.OK)
+bool hasPointsLeft = true;
+while(hasPointsLeft){
+    while (q == null)
     {
-        Console.Clear();
-        q = JsonSerializer.Deserialize<List<Quiz>>(QuizResponse.Content).First();
-        
-        // fixa clues genom att sätta in det i annan class (???)
 
-        bool MadeChoice = false;
-        int Choice;
-        while (!MadeChoice)
+        RestResponse QuizResponse = QuizClient.GetAsync(QuizRequest).Result;
+
+        if (QuizResponse.StatusCode == HttpStatusCode.OK)
         {
-            WritePoints(board);
-            // ritar ut texten
-            Menu(q);
+            Console.Clear();
+            q = JsonSerializer.Deserialize<List<Quiz>>(QuizResponse.Content).First();
             
-            // fixa med andra classen 
-            // Fråga om använmdaren vill ha den här
-            // Om inte
-            //  q = null;
+            // fixa clues genom att sätta in det i annan class (???)
 
-            MadeChoice = int.TryParse(Console.ReadLine(), out Choice);
-            switch (Choice)
+            bool MadeChoice = false;
+            int Choice;
+            while (!MadeChoice)
             {
-                case 1:
-                    //fortsäter till näs man ska svara
-                    break;
-                case 2:
-                    q = null;
-                    break;
-                default:
-                    MadeChoice = false;
-                    break;
+                WritePoints();
+                // ritar ut texten
+                Menu(q);
+                
+                // fixa med andra classen 
+                // Fråga om använmdaren vill ha den här
+                // Om inte
+                //  q = null;
+
+                MadeChoice = int.TryParse(Console.ReadLine(), out Choice);
+                switch (Choice)
+                {
+                    case 1:
+                        //fortsäter och skriver ut frågan
+                        break;
+                    case 2:
+                        // ger en ny fråga 
+                        q = null;
+                        break;
+                    default:
+                        MadeChoice = false;
+                        break;
+                }
+
             }
 
+
+        }
+        else
+        {
+            System.Console.WriteLine("not found");
+            Console.ReadLine();
+        }
+    }
+    bool result=false;
+    bool hasAnswered = false;
+    Clues HiddenAnswer = new Clues(q);
+    while (!hasAnswered)
+    {
+        
+        Console.Clear();
+        WritePoints();
+        WriteQuestion(q);
+        HiddenAnswer.WriteHidenAnswer();
+        int i;
+        
+        hasAnswered = int.TryParse(Console.ReadLine(), out i);
+        switch (i)
+        {
+            case 1:
+                System.Console.WriteLine("Write answer:");
+                string PlayerGuess = Console.ReadLine();
+                result = q.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
+
+                
+                break;
+            case 2:
+                
+                HiddenAnswer.RevealLetter(q, HiddenAnswer);
+                
+                hasAnswered = false;
+                break;
+            case 3:
+                
+                //HiddenAnswer.CluesLeft = 0;
+                System.Console.WriteLine($"{q.Answer}");
+                hasAnswered = false;
+                Console.ReadLine();
+                break;
+            default:
+                hasAnswered = false;
+                break;
+        }
+        // ser om spelaren har använt alla sina ledtrådar 
+        // eller om de har slut på poäng
+        if(HiddenAnswer.CluesLeft<= 0 || IsOutOfpoints())
+        {
+            hasAnswered = true;
+            result = false;
         }
 
+    }
 
+    if(result)
+    {
+        System.Console.WriteLine($"Correct! You gained {q.Difficulty} points!");
+        q.AddPoints();
+        
     }
     else
     {
-        System.Console.WriteLine("not found");
-        Console.ReadLine();
+        q.RemovePoints();
+        System.Console.WriteLine($"WRONG! You lost {q.Difficulty} points");
+        System.Console.WriteLine($"Correct answer: {q.Answer}");
     }
-}
-bool result=false;
-bool hasAnswered = false;
-Clues HiddenAnswer = new Clues(q);
-while (!hasAnswered)
-{
-    
-    Console.Clear();
-    WritePoints(board);
-    WriteQuestion(q);
-    HiddenAnswer.WriteHidenAnswer();
-    int i;
-    
-    hasAnswered = int.TryParse(Console.ReadLine(), out i);
-    switch (i)
+    if(IsOutOfpoints())
     {
-        case 1:
-            System.Console.WriteLine("Write answer:");
-            string PlayerGuess = Console.ReadLine();
-            result = q.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
-
-            
-            break;
-        case 2:
-            
-            HiddenAnswer.RevealLetter(q, HiddenAnswer);
-            q.AddPoints();
-            hasAnswered = false;
-            break;
-        case 3:
-            System.Console.WriteLine($"awnser {q.Answer}");
-            hasAnswered = false;
-            Console.ReadLine();
-            break;
-        default:
-            hasAnswered = false;
-            break;
+        hasPointsLeft = false;
+        System.Console.WriteLine("You are out of points");
     }
-
-
+    WritePoints();
+    Console.ReadLine();
+    q = null;
 }
-
-if(result)
-{
-    System.Console.WriteLine("Correct");
-    WritePoints(board);
-}
-else
-{
-    System.Console.WriteLine("WRONG");
-}
-
-Console.ReadLine();
-
 
 
 
@@ -129,12 +147,12 @@ static void WriteQuestion(Quiz Question)
     System.Console.WriteLine($"-------------------------------------- ");
     System.Console.WriteLine("What do you whant to do?");
     System.Console.WriteLine("1. Answer question");
-    System.Console.WriteLine("2. Reveal one leter");
-    System.Console.WriteLine("3. give Answer(remove later)");
+    System.Console.WriteLine("2. Reveal one leter(uses 50 points)");
+    System.Console.WriteLine("3. Give Answer(Removes points and gives you a diffrent question.)");
 }
-static void WritePoints(PointBoard pb)
+static void WritePoints()
 {
-    System.Console.WriteLine($" Points left: {pb.TotalPoints}");
+    System.Console.WriteLine($" Points left: {PointGiver.TotalPoints}");
     System.Console.WriteLine($"-------------------------------------- ");
 
 }
@@ -146,7 +164,18 @@ static void Menu(Quiz Question)
     // Fråga om använmdaren vill ha den här
     // Om inte
     //  q = null;
-    System.Console.WriteLine("Do you whant to awnser the question?");
+    System.Console.WriteLine("Do you want to answer the question?");
     System.Console.WriteLine("1. Yes, give me the question.");
     System.Console.WriteLine("2. No, give me a diffrent question.");
+}
+static bool IsOutOfpoints()
+{
+    if(PointGiver.TotalPoints<= 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

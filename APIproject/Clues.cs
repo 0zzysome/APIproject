@@ -15,15 +15,20 @@ public class Clues : Quiz
         
         for (var i = 0; i < q.Answer.Length; i++)
         {
+            
+
             if (q.Answer[i] != ' ')
             {
                 HiddenHint += "-";
                 CluesLeft += 1;
             }
+            //gör så alla mellanslag inte räknas som gömda bokstäver
             else
             {
                 HiddenHint += ' ';   
             }
+            
+            
          
         }
         
@@ -41,6 +46,7 @@ public class Clues : Quiz
                 ca[p] = AnswerChar[p];
                 c.HiddenHint = string.Join("", ca);
                 c.CluesLeft -= 1; 
+                PointGiver.TotalPoints -= 50;
                 NotRevealed = false;
             }
         }
@@ -52,6 +58,8 @@ public class Clues : Quiz
         System.Console.WriteLine($"Hints Left: {CluesLeft}");
         System.Console.WriteLine($"Hint of answer: {HiddenHint}");
     }
+    
+    
     
 }
 
