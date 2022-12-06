@@ -107,6 +107,8 @@ while(hasPointsLeft){
         // eller om de har slut på poäng
         if(HiddenAnswer.CluesLeft<= 0 || IsOutOfpoints())
         {
+            System.Console.WriteLine("you have ran out of points or clues.");
+            
             hasAnswered = true;
             result = false;
         }
