@@ -46,7 +46,7 @@ public class Clues : Quiz
                 ca[p] = AnswerChar[p];
                 c.HiddenHint = string.Join("", ca);
                 c.CluesLeft -= 1; 
-                PointGiver.TotalPoints -= 50;
+                c.RemovePoints();
                 NotRevealed = false;
             }
         }
@@ -59,7 +59,10 @@ public class Clues : Quiz
         System.Console.WriteLine($"Hint of answer: {HiddenHint}");
     }
     
-    
+    public override void RemovePoints()
+    {
+        TotalPoints -= 50;
+    }
     
 }
 
