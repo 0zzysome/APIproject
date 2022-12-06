@@ -24,6 +24,7 @@ while(hasPointsLeft){
             int Choice;
             while (!MadeChoice)
             {
+                Console.Clear();
                 WritePoints();
                 // ritar ut texten
                 Menu(q);
@@ -44,6 +45,9 @@ while(hasPointsLeft){
                         q = null;
                         break;
                     default:
+                        System.Console.WriteLine("No choice was made, make shure to only write a letter. Press enter to continue");
+                        Console.ReadLine();
+                        
                         MadeChoice = false;
                         break;
                 }
@@ -94,6 +98,8 @@ while(hasPointsLeft){
                 Console.ReadLine();
                 break;
             default:
+                System.Console.WriteLine("No choice was made, make shure to only write a letter. Press enter to continue");
+                Console.ReadLine();
                 hasAnswered = false;
                 break;
         }
@@ -125,6 +131,7 @@ while(hasPointsLeft){
         System.Console.WriteLine("You are out of points");
     }
     WritePoints();
+    System.Console.WriteLine("Press enter to continue");
     Console.ReadLine();
     q = null;
 }
