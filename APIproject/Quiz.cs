@@ -18,8 +18,12 @@ public class Quiz : PointGiver
     [JsonPropertyName("category")]
     public Category Category {get; set;}
     
-    protected Random generator = new();
-
+    protected Random Generator = new();
+    //Lägg till: fixa svaren och mer
+    public void Clean()
+    {
+        Answer = Answer.Replace("<i>", "");
+    }
     
 
     public override void AddPoints()
@@ -29,6 +33,27 @@ public class Quiz : PointGiver
     public override void RemovePoints()
     {
         TotalPoints -= Difficulty;
+    }
+
+
+    public void WriteQuestion()
+    {
+        System.Console.WriteLine($" Catagory: {Category.Title}");
+        System.Console.WriteLine($"-------------------------------------- ");
+        System.Console.WriteLine($"{Question}");
+        System.Console.WriteLine($"-------------------------------------- ");
+        System.Console.WriteLine("What do you whant to do?");
+        System.Console.WriteLine("1. Answer question");
+        System.Console.WriteLine("2. Reveal one leter(uses 50 points)");
+        System.Console.WriteLine("3. Give Answer(Removes points and gives you a diffrent question.)");
+    }
+    public void Menu()
+    {
+        System.Console.WriteLine($" Catagory: {Category.Title}");
+        System.Console.WriteLine($" Difficulty: {Difficulty}");
+        System.Console.WriteLine("Do you want to answer the question?");
+        System.Console.WriteLine("1. Yes, give me the question.");
+        System.Console.WriteLine("2. No, give me a diffrent question.");
     }
 }
 

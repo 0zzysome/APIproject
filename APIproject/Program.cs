@@ -6,22 +6,33 @@ RestClient QuizClient = new("https://jservice.io/api/");
 
 RestRequest QuizRequest = new("random");
 
-
+bool HasPointsLeft = true;
 // startmeny
-bool hasGameType = false;
+bool HasGameType = false;
 int GameType= 3;
-while(!hasGameType)
+while(!HasGameType)
 {
-    // skapa enn meny här sen.
+    // lägg till: en meny här sen.
     System.Console.WriteLine("chose game type ");
-    hasGameType = int.TryParse(Console.ReadLine(), out GameType);
+    HasGameType = int.TryParse(Console.ReadLine(), out GameType);
     //om spelaren valde 1 eller 2 så ändras inte hasGameType och koden fortsätter.
-    if(GameType != 1 || GameType != 2)
+    //btw jag vet att koden är dålig men den funkar
+    if(GameType ==1 )
     {
-        System.Console.WriteLine("No choice was made, make shure to only write a letter. Press enter to continue");
-        Console.ReadLine();
-        
-        hasGameType = false;
+        //lägg till: vilen de valde
+        HasGameType = true;
+
+    }
+    else if(GameType == 2)
+    {
+        //lägg till: vilen de valde
+        HasGameType = true;
+
+    }
+    else
+    {
+        //lägg till: felmedelande
+        HasGameType = false;
     }
 
 }
@@ -29,8 +40,7 @@ while(!hasGameType)
 if(GameType== 1)
 {
     Quiz q = null;
-    bool hasPointsLeft = true;
-    while(hasPointsLeft){
+    while(HasPointsLeft){
 
         while (q == null)
         {
@@ -42,6 +52,7 @@ if(GameType== 1)
                 Console.Clear();
                 //skapar frågan
                 q = JsonSerializer.Deserialize<List<Quiz>>(QuizResponse.Content).First();
+                q.Clean();
                 bool MadeChoice = false;
                 int Choice;
                 //körs medans spelaren inte har valt
@@ -49,10 +60,10 @@ if(GameType== 1)
                 {
                     Console.Clear();
                     // ritar ut texten
-                    // Fråga om använmdaren vill ha den här frågan
-                    WritePoints();
-                    Menu(q);
-                    //tar input och försöker göra den till en int
+                    // Frågar om användaren vill ha den här frågan eller byta den
+                    q.WritePoints();
+                    q.Menu();
+                    //tar input och gör till en int 
                     MadeChoice = int.TryParse(Console.ReadLine(), out Choice);
                     switch (Choice)
                     {
@@ -77,6 +88,7 @@ if(GameType== 1)
 
 
             }
+            //körs endast om något fel upstod då man förfrågade information från API:n
             else
             {
                 System.Console.WriteLine("not found");
@@ -84,41 +96,44 @@ if(GameType== 1)
             }
         }
         // när använaren har valt fråga så körs detta 
-        bool result=false;
-        bool hasAnswered = false;
+        bool Result=false;
+        bool HasAnswered = false;
         Clues HiddenAnswer = new Clues(q);
-        while (!hasAnswered)
+        while (!HasAnswered)
         {
             //skapar meny 
             Console.Clear();
-            WritePoints();
-            WriteQuestion(q);
+            q.WritePoints();
+            q.WriteQuestion();
             HiddenAnswer.WriteHidenAnswer();
             int i;
             //tar input och försöker göra den till en int och sparar den 
-            hasAnswered = int.TryParse(Console.ReadLine(), out i);
+            HasAnswered = int.TryParse(Console.ReadLine(), out i);
             switch (i)
             {
                 case 1:
                     System.Console.WriteLine("Write answer:");
+                    //gör så att spelaren lan skriva in sin gissning 
                     string PlayerGuess = Console.ReadLine();
-                    result = q.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
+                    //gämför gissningen med svaret och ger ett reslutat
+                    Result = q.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
                     break;
                 case 2:
-                    HiddenAnswer.RevealLetter(q, HiddenAnswer);
-                    hasAnswered = false;
+                    HiddenAnswer.RevealLetter(q);
+                    HasAnswered = false;
                     break;
                 case 3:
-                
-                    HiddenAnswer.CluesLeft = 0;
+                    //blir san så programet fortsätter 
+                    HasAnswered = true;
+                    // ser till att programet markerar svaret som fel då spelaren inte svarade
+                    Result = false;
                     System.Console.WriteLine($"{q.Answer}");
-                    hasAnswered = false;
                     Console.ReadLine();
                     break;
                 default:
                     System.Console.WriteLine("No choice was made, make shure to only write a letter. Press enter to continue");
                     Console.ReadLine();
-                    hasAnswered = false;
+                    HasAnswered = false;
                     break;
             }
             // ser om spelaren har använt alla sina ledtrådar 
@@ -127,15 +142,15 @@ if(GameType== 1)
             {
                 System.Console.WriteLine("you have ran out of points or clues.");
                 
-                hasAnswered = true;
-                result = false;
+                HasAnswered = true;
+                Result = false;
             }
 
         }
 
-        if(result)
+        if(Result)
         {
-            System.Console.WriteLine($"Correct! You gained {q.Difficulty} points!");
+            System.Console.WriteLine($"CORRECT! You gained {q.Difficulty} points!");
             q.AddPoints();
             
         }
@@ -145,12 +160,13 @@ if(GameType== 1)
             System.Console.WriteLine($"WRONG! You lost {q.Difficulty} points");
             System.Console.WriteLine($"Correct answer: {q.Answer}");
         }
+        //kollar om spelaren har poäng kvar och avlsutar while satsen om det har slut på poäng
         if(IsOutOfpoints())
         {
-            hasPointsLeft = false;
+            HasPointsLeft = false;
             System.Console.WriteLine("You are out of points");
         }
-        WritePoints();
+        q.WritePoints();
         System.Console.WriteLine("Press enter to continue");
         Console.ReadLine();
         q = null;
@@ -158,47 +174,49 @@ if(GameType== 1)
 }
 //svår frågesport
 else
-{
-    RestResponse QuizResponse = QuizClient.GetAsync(QuizRequest).Result;
+{   
+    
+    HardQuiz HardQ = null;
+    //kör spelet medans spelaren har poäng kvar.
+    while(!IsOutOfpoints())
+    {
+        Console.Clear();
+        //hämtar en respons från api 
+        RestResponse QuizResponse = QuizClient.GetAsync(QuizRequest).Result;
+        bool IsCorrect = false;
+        //sparar värderna från responsen i variabeln
+        HardQ = JsonSerializer.Deserialize<List<HardQuiz>>(QuizResponse.Content).First();
+        //skriver ut meny
+        HardQ.WritePoints();
+        HardQ.WriteQuestion();
+        string PlayerGuess = Console.ReadLine();
+        // svaret gämförs och sparas i en boolean
+        IsCorrect = HardQ.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
+
+        if(IsCorrect)
+        {
+            System.Console.WriteLine($"CORRECT! You gained {HardQ.Difficulty} points!");
+            HardQ.AddPoints();
+            
+        }
+        else
+        {
+            
+            System.Console.WriteLine($"WRONG! You lost {HardQ.Difficulty/2} points");
+            System.Console.WriteLine($"Correct answer: {HardQ.Answer}");
+            HardQ.RemovePoints();
+        }
+        Console.ReadLine();
+        
+    }
+    System.Console.WriteLine("You are out of points. Press enter to continue");
 }
 
 
 
 
+//lägg till: ike statiska och lägg i klasser istället
 
-
-
-
-
-static void WriteQuestion(Quiz Question)
-{
-    System.Console.WriteLine($" Catagory: {Question.Category.Title}");
-    System.Console.WriteLine($"-------------------------------------- ");
-    System.Console.WriteLine($"{Question.Question}");
-    System.Console.WriteLine($"-------------------------------------- ");
-    System.Console.WriteLine("What do you whant to do?");
-    System.Console.WriteLine("1. Answer question");
-    System.Console.WriteLine("2. Reveal one leter(uses 50 points)");
-    System.Console.WriteLine("3. Give Answer(Removes points and gives you a diffrent question.)");
-}
-static void WritePoints()
-{
-    System.Console.WriteLine($" Points left: {PointGiver.TotalPoints}");
-    System.Console.WriteLine($"-------------------------------------- ");
-
-}
-static void Menu(Quiz Question)
-{
-    System.Console.WriteLine($" Catagory: {Question.Category.Title}");
-    System.Console.WriteLine($" Difficulty: {Question.Difficulty}");
-
-    // Fråga om använmdaren vill ha den här
-    // Om inte
-    //  q = null;
-    System.Console.WriteLine("Do you want to answer the question?");
-    System.Console.WriteLine("1. Yes, give me the question.");
-    System.Console.WriteLine("2. No, give me a diffrent question.");
-}
 static bool IsOutOfpoints()
 {
     if(PointGiver.TotalPoints<= 0)

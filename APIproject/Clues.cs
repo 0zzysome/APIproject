@@ -4,7 +4,7 @@ public class Clues : Quiz
 {
 
     // ska få tag i svaret och skapa sin egna hint som har alla bokstäver utkrysna
-    // spelaren kan sen välja att reveala en boktav 
+    // spelaren kan sen välja att visa en boktav i taget
     
     public string HiddenHint { get; set; } = "";
     public int CluesLeft { get; set; } = 0;
@@ -12,11 +12,11 @@ public class Clues : Quiz
     public Clues(Quiz q)
     {
         
-        
+        //konverterar svaret till ett hemligt svar
         for (var i = 0; i < q.Answer.Length; i++)
         {
             
-
+            
             if (q.Answer[i] != ' ')
             {
                 HiddenHint += "-";
@@ -33,20 +33,21 @@ public class Clues : Quiz
         }
         
     }
-    public void RevealLetter(Quiz q, Clues c)
+    public void RevealLetter(Quiz q)
     {
         bool NotRevealed = true;
+        //körs tills en ny slupad bokstav har visats
         while(NotRevealed)
         {
-            char[] ca = c.HiddenHint.ToArray();
+            char[] ca = HiddenHint.ToArray();
             char[] AnswerChar = q.Answer.ToArray();
-            int p = generator.Next(0, q.Answer.Length);
+            int p = Generator.Next(0, q.Answer.Length);
             if(ca[p]=='-')
             {
                 ca[p] = AnswerChar[p];
-                c.HiddenHint = string.Join("", ca);
-                c.CluesLeft -= 1; 
-                c.RemovePoints();
+                HiddenHint = string.Join("", ca);
+                CluesLeft -= 1; 
+                RemovePoints();
                 NotRevealed = false;
             }
         }
