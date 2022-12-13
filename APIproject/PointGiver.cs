@@ -19,4 +19,5 @@ public class PointGiver
         System.Console.WriteLine($" Points left: {PointGiver.TotalPoints}");
         System.Console.WriteLine($"-------------------------------------- ");
     }
+    
 }

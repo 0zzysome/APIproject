@@ -19,10 +19,13 @@ public class Quiz : PointGiver
     public Category Category {get; set;}
     
     protected Random Generator = new();
-    //Lägg till: fixa svaren och mer
-    public void Clean()
+    
+    public void CleanAnswer()
     {
         Answer = Answer.Replace("<i>", "");
+        Answer = Answer.Replace("</i>", "");
+        Answer = Answer.Replace("\"", "");
+        Answer = Answer.Replace("\\", "");
     }
     
 
@@ -38,7 +41,7 @@ public class Quiz : PointGiver
 
     public void WriteQuestion()
     {
-        System.Console.WriteLine($" Catagory: {Category.Title}");
+        System.Console.WriteLine($" Catagory: {Category.Title} || Difficulty: {Difficulty}");
         System.Console.WriteLine($"-------------------------------------- ");
         System.Console.WriteLine($"{Question}");
         System.Console.WriteLine($"-------------------------------------- ");

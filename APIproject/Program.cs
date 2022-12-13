@@ -5,33 +5,53 @@ using System.Net;
 RestClient QuizClient = new("https://jservice.io/api/");
 
 RestRequest QuizRequest = new("random");
+//boolean hanterar om spelet ska avlutas.
+bool GameIsGoing = true;
 
-bool HasPointsLeft = true;
-// startmeny
 bool HasGameType = false;
 int GameType= 3;
+// startmeny
 while(!HasGameType)
 {
+    Console.Clear();
     // lägg till: en meny här sen.
-    System.Console.WriteLine("chose game type ");
+    System.Console.WriteLine("Chose game type: ");
+    System.Console.WriteLine("1. Normal mode. ");
+    System.Console.WriteLine("You get the topic and difficulty of a question and can choose to answer it or to get a diffrent question.");
+    System.Console.WriteLine("After choosing the question you can spend 50 points to unlock one letter from the answer.");
+    System.Console.WriteLine("You start with 1000 points, you gain and lose points equal to the difficulty based on if you answer correctly. ");
+    System.Console.WriteLine("You win at 2300 points ");
+    System.Console.WriteLine("2. Hard mode. ");
+    System.Console.WriteLine("For those who are Jeopardy kings. You get random questions and no hints. You start with 1000 points.");
+    System.Console.WriteLine("However you gain or lose only half the points of the difficulty.");
+    System.Console.WriteLine("You win at 2000 points ");
     HasGameType = int.TryParse(Console.ReadLine(), out GameType);
     //om spelaren valde 1 eller 2 så ändras inte hasGameType och koden fortsätter.
     //btw jag vet att koden är dålig men den funkar
     if(GameType ==1 )
     {
         //lägg till: vilen de valde
+        System.Console.WriteLine("You chose: Normal mode");
+        System.Console.WriteLine("Press enter to continue");
+        Console.ReadLine();
         HasGameType = true;
 
     }
     else if(GameType == 2)
     {
         //lägg till: vilen de valde
+        System.Console.WriteLine("You chose: Hard mode");
+        System.Console.WriteLine("Press enter to continue");
+        Console.ReadLine();
         HasGameType = true;
 
     }
     else
     {
-        //lägg till: felmedelande
+        System.Console.WriteLine("Make shure to write a letter from the menu.");
+        System.Console.WriteLine("Press enter to continue");
+        Console.ReadLine();
+        
         HasGameType = false;
     }
 
@@ -40,7 +60,7 @@ while(!HasGameType)
 if(GameType== 1)
 {
     Quiz q = null;
-    while(HasPointsLeft){
+    while(GameIsGoing){
 
         while (q == null)
         {
@@ -52,7 +72,7 @@ if(GameType== 1)
                 Console.Clear();
                 //skapar frågan
                 q = JsonSerializer.Deserialize<List<Quiz>>(QuizResponse.Content).First();
-                q.Clean();
+                q.CleanAnswer();
                 bool MadeChoice = false;
                 int Choice;
                 //körs medans spelaren inte har valt
@@ -163,8 +183,14 @@ if(GameType== 1)
         //kollar om spelaren har poäng kvar och avlsutar while satsen om det har slut på poäng
         if(IsOutOfpoints())
         {
-            HasPointsLeft = false;
-            System.Console.WriteLine("You are out of points");
+            GameIsGoing = false;
+            System.Console.WriteLine("You have LOST the Normal Jeopardy Quiz!");
+        }
+        //kollar om spelaren har tillråklig med poäng för att vinna
+        if(HasWonGame(GameType))
+        {
+            GameIsGoing = false;
+            System.Console.WriteLine("Congratulations! You have WON the Normal Jeopardy Quiz!");
         }
         q.WritePoints();
         System.Console.WriteLine("Press enter to continue");
@@ -178,7 +204,7 @@ else
     
     HardQuiz HardQ = null;
     //kör spelet medans spelaren har poäng kvar.
-    while(!IsOutOfpoints())
+    while(!IsOutOfpoints() && !HasWonGame(GameType))
     {
         Console.Clear();
         //hämtar en respons från api 
@@ -186,16 +212,18 @@ else
         bool IsCorrect = false;
         //sparar värderna från responsen i variabeln
         HardQ = JsonSerializer.Deserialize<List<HardQuiz>>(QuizResponse.Content).First();
+        HardQ.CleanAnswer();
         //skriver ut meny
         HardQ.WritePoints();
         HardQ.WriteQuestion();
+
         string PlayerGuess = Console.ReadLine();
         // svaret gämförs och sparas i en boolean
         IsCorrect = HardQ.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
 
         if(IsCorrect)
         {
-            System.Console.WriteLine($"CORRECT! You gained {HardQ.Difficulty} points!");
+            System.Console.WriteLine($"CORRECT! You gained {HardQ.Difficulty/2} points!");
             HardQ.AddPoints();
             
         }
@@ -206,16 +234,26 @@ else
             System.Console.WriteLine($"Correct answer: {HardQ.Answer}");
             HardQ.RemovePoints();
         }
+        if(IsOutOfpoints())
+        {
+            GameIsGoing = false;
+            System.Console.WriteLine("You have LOST the Hard Jeopardy Quiz!");
+        }
+        if(HasWonGame(GameType))
+        {
+            GameIsGoing = false;
+            System.Console.WriteLine("Congratulations! You have WON the Hard Jeopardy Quiz!");
+        }
         Console.ReadLine();
-        
+        HardQ = null;
     }
-    System.Console.WriteLine("You are out of points. Press enter to continue");
+    
 }
 
 
 
 
-//lägg till: ike statiska och lägg i klasser istället
+//lägg till: ike statiska och lägg i klasser istället kanske fråga martin
 
 static bool IsOutOfpoints()
 {
@@ -226,5 +264,33 @@ static bool IsOutOfpoints()
     else
     {
         return false;
+    }
+}
+
+bool HasWonGame(int GameMode)
+{
+    //normal quiz
+    if(GameMode == 1)
+    {
+        if(PointGiver.TotalPoints>=2300)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    //hard quiz
+    else
+    {
+        if(PointGiver.TotalPoints>=2000)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

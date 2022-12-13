@@ -14,18 +14,18 @@ public class HardQuiz : PointGiver
     [JsonPropertyName("value")]
     public int Difficulty { get; set; }
 
-    
-
     [JsonPropertyName("answer")]
     public string Answer { get; set; }
 
     [JsonPropertyName("category")]
     public Category Category {get; set;}
-    //Lägg till: fixa svaren och mer
-    public void Clean()
+    
+    public void CleanAnswer()
     {
         Answer = Answer.Replace("<i>", "");
-        Answer = Answer.Replace("<i>", "");
+        Answer = Answer.Replace("</i>", "");
+        Answer = Answer.Replace("\"", "");
+        Answer = Answer.Replace("\\", "");
     }
 
     public override void RemovePoints()
@@ -34,7 +34,7 @@ public class HardQuiz : PointGiver
     } 
     public override void AddPoints()
     {
-        TotalPoints += Difficulty;
+        TotalPoints += Difficulty/2;
     }
     public void WriteQuestion()
     {
