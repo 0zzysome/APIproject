@@ -19,5 +19,29 @@ public class PointGiver
         System.Console.WriteLine($" Points left: {PointGiver.TotalPoints}");
         System.Console.WriteLine($"-------------------------------------- ");
     }
-    
+
+    public bool IsOutOfpoints()
+    {
+        if(PointGiver.TotalPoints<= 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    //kan göra virtual för de olika subklaserna
+    public virtual bool HasWonGame()
+    {
+        //normal quiz
+        if(PointGiver.TotalPoints>=2300)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

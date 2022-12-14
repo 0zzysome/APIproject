@@ -58,5 +58,16 @@ public class Quiz : PointGiver
         System.Console.WriteLine("1. Yes, give me the question.");
         System.Console.WriteLine("2. No, give me a diffrent question.");
     }
+    public override bool HasWonGame()
+    {
+        if(PointGiver.TotalPoints>=2300)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
 

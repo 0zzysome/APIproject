@@ -46,4 +46,16 @@ public class HardQuiz : PointGiver
         //Lägg till: ta bort detta 
         System.Console.WriteLine($"Answer: {Answer}");
     }
+    public override bool HasWonGame()
+    {
+        if(PointGiver.TotalPoints>=2000)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
 }

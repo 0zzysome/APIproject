@@ -158,7 +158,7 @@ if(GameType== 1)
             }
             // ser om spelaren har använt alla sina ledtrådar 
             // eller om de har slut på poäng
-            if(HiddenAnswer.CluesLeft<= 0 || IsOutOfpoints())
+            if(HiddenAnswer.CluesLeft<= 0 || q.IsOutOfpoints())
             {
                 System.Console.WriteLine("you have ran out of points or clues.");
                 
@@ -181,13 +181,13 @@ if(GameType== 1)
             System.Console.WriteLine($"Correct answer: {q.Answer}");
         }
         //kollar om spelaren har poäng kvar och avlsutar while satsen om det har slut på poäng
-        if(IsOutOfpoints())
+        if(q.IsOutOfpoints())
         {
             GameIsGoing = false;
             System.Console.WriteLine("You have LOST the Normal Jeopardy Quiz!");
         }
         //kollar om spelaren har tillråklig med poäng för att vinna
-        if(HasWonGame(GameType))
+        if(q.HasWonGame())
         {
             GameIsGoing = false;
             System.Console.WriteLine("Congratulations! You have WON the Normal Jeopardy Quiz!");
@@ -204,7 +204,7 @@ else
     
     HardQuiz HardQ = null;
     //kör spelet medans spelaren har poäng kvar.
-    while(!IsOutOfpoints() && !HasWonGame(GameType))
+    while(!HardQ.IsOutOfpoints() && !HardQ.HasWonGame())
     {
         Console.Clear();
         //hämtar en respons från api 
@@ -234,12 +234,12 @@ else
             System.Console.WriteLine($"Correct answer: {HardQ.Answer}");
             HardQ.RemovePoints();
         }
-        if(IsOutOfpoints())
+        if(HardQ.IsOutOfpoints())
         {
             GameIsGoing = false;
             System.Console.WriteLine("You have LOST the Hard Jeopardy Quiz!");
         }
-        if(HasWonGame(GameType))
+        if(HardQ.HasWonGame())
         {
             GameIsGoing = false;
             System.Console.WriteLine("Congratulations! You have WON the Hard Jeopardy Quiz!");
@@ -255,42 +255,5 @@ else
 
 //lägg till: ike statiska och lägg i klasser istället kanske fråga martin
 
-static bool IsOutOfpoints()
-{
-    if(PointGiver.TotalPoints<= 0)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
 
-bool HasWonGame(int GameMode)
-{
-    //normal quiz
-    if(GameMode == 1)
-    {
-        if(PointGiver.TotalPoints>=2300)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    //hard quiz
-    else
-    {
-        if(PointGiver.TotalPoints>=2000)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-}
+

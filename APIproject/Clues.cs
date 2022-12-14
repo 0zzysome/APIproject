@@ -5,10 +5,8 @@ public class Clues : Quiz
 
     // ska få tag i svaret och skapa sin egna hint som har alla bokstäver utkrysna
     // spelaren kan sen välja att visa en boktav i taget
-    
     public string HiddenHint { get; set; } = "";
     public int CluesLeft { get; set; } = 0;
-
     public Clues(Quiz q)
     {
         
