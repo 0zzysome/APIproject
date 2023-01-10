@@ -2,6 +2,19 @@
 using System.Text.Json;
 using System.Net;
 
+GameInstance Game = new GameInstance();
+
+Game.ShowStartMenu();
+if(Game.GameType==1)
+{
+    Game.StartNormalQuiz();
+}
+else
+{
+    Game.StartHardQuiz();
+}
+
+/*
 RestClient QuizClient = new("https://jservice.io/api/");
 
 RestRequest QuizRequest = new("random");
@@ -216,7 +229,6 @@ else
         //skriver ut meny
         HardQ.WritePoints();
         HardQ.WriteQuestion();
-
         string PlayerGuess = Console.ReadLine();
         // svaret gämförs och sparas i en boolean
         IsCorrect = HardQ.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
@@ -229,7 +241,6 @@ else
         }
         else
         {
-            
             System.Console.WriteLine($"WRONG! You lost {HardQ.Difficulty/2} points");
             System.Console.WriteLine($"Correct answer: {HardQ.Answer}");
             HardQ.RemovePoints();
@@ -249,7 +260,7 @@ else
     }
     
 }
-
+*/
 
 
 
