@@ -41,7 +41,7 @@ public class Quiz : PointGiver
 
     public void WriteQuestion()
     {
-        System.Console.WriteLine($" Catagory: {Category.Title} || Difficulty: {Difficulty}");
+        System.Console.WriteLine($" Category: {Category.Title} || Difficulty: {Difficulty}");
         System.Console.WriteLine($"-------------------------------------- ");
         System.Console.WriteLine($"{Question}");
         System.Console.WriteLine($"-------------------------------------- ");
@@ -52,9 +52,9 @@ public class Quiz : PointGiver
     }
     public void Menu()
     {
-        System.Console.WriteLine($" Catagory: {Category.Title}");
+        System.Console.WriteLine($" Category: {Category.Title}");
         System.Console.WriteLine($" Difficulty: {Difficulty}");
-        System.Console.WriteLine("Do you want to answer the question?");
+        System.Console.WriteLine("Do you whant to answer the question?");
         System.Console.WriteLine("1. Yes, give me the question.");
         System.Console.WriteLine("2. No, give me a diffrent question.");
     }

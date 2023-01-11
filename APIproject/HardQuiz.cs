@@ -38,7 +38,7 @@ public class HardQuiz : PointGiver
     }
     public void WriteQuestion()
     {
-        System.Console.WriteLine($" Catagory: {Category.Title} || Difficulty: {Difficulty}");
+        System.Console.WriteLine($" Category: {Category.Title} || Difficulty: {Difficulty}");
         System.Console.WriteLine($"-------------------------------------- ");
         System.Console.WriteLine($"{Question}");
         System.Console.WriteLine($"-------------------------------------- ");

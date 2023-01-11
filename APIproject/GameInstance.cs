@@ -21,17 +21,7 @@ public class GameInstance
 
             Console.Clear();
             // lägg till: mindre kod 
-            System.Console.WriteLine("Welcome to the Jeopardy Quiz!");
-            System.Console.WriteLine("Chose game type: ");
-            System.Console.WriteLine("1. Normal mode. ");
-            System.Console.WriteLine("You get the topic and difficulty of a question and can choose to answer it or to get a diffrent question.");
-            System.Console.WriteLine("After choosing the question you can spend 50 points to unlock one letter from the answer.");
-            System.Console.WriteLine("You start with 1000 points, you gain and lose points equal to the difficulty based on if you answer correctly. ");
-            System.Console.WriteLine("You win at 2300 points ");
-            System.Console.WriteLine("2. Hard mode. ");
-            System.Console.WriteLine("For those who are Jeopardy kings. You get random questions and no hints. You start with 1000 points.");
-            System.Console.WriteLine("However you gain or lose only half the points of the difficulty.");
-            System.Console.WriteLine("You win at 2000 points ");
+            DrawStartMenuText();
             HasGameType = int.TryParse(Console.ReadLine(), out GameType);
             //om spelaren valde 1 eller 2 så ändras inte hasGameType och koden fortsätter.
             //btw jag vet att koden är dålig men den funkar
@@ -75,7 +65,9 @@ public class GameInstance
                     Console.Clear();
                     //skapar frågan
                     q = JsonSerializer.Deserialize<List<Quiz>>(QuizResponse.Content).First();
+                    // tar bort tecken som inte behövs i frågan
                     q.CleanAnswer();
+
                     q = ChoseNormalQuestion(q);
                 }
                 //körs endast om något fel upstod då man förfrågade information från API:n
@@ -85,8 +77,10 @@ public class GameInstance
                     Console.ReadLine();
                 }
             }
-            
+
             // när använaren har valt fråga så körs detta 
+            bool Result = NormalQuizHandler(q);
+            /*
             bool Result = false;
             bool HasAnswered = false;
             Clues HiddenAnswer = new Clues(q);
@@ -138,6 +132,7 @@ public class GameInstance
                 }
 
             }
+            */
 
             if (Result)
             {
@@ -171,20 +166,35 @@ public class GameInstance
     //svår frågesport
     public void StartHardQuiz()
     {
-        HardQuiz HardQ = null;
+        HardQuiz HardQ = new HardQuiz();
         //kör spelet medans spelaren har poäng kvar.
         while (!HardQ.IsOutOfpoints() && !HardQ.HasWonGame())
         {
+            
+            HardQ = null;
+            while (HardQ == null)
+            {
+
+                //hämtar en respons från api 
+                RestResponse QuizResponse = QuizClient.GetAsync(QuizRequest).Result;
+                
+                //sparar värderna från responsen i variabeln
+                try
+                {
+                    HardQ = JsonSerializer.Deserialize<List<HardQuiz>>(QuizResponse.Content).First();
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine("Something wrong, getting new question");
+                }
+            }
             Console.Clear();
-            //hämtar en respons från api 
-            RestResponse QuizResponse = QuizClient.GetAsync(QuizRequest).Result;
-            bool IsCorrect = false;
-            //sparar värderna från responsen i variabeln
-            HardQ = JsonSerializer.Deserialize<List<HardQuiz>>(QuizResponse.Content).First();
             HardQ.CleanAnswer();
             //skriver ut meny
             HardQ.WritePoints();
             HardQ.WriteQuestion();
+            bool IsCorrect = false;
+            //spelaren svarar
             string PlayerGuess = Console.ReadLine();
             // svaret gämförs och sparas i en boolean
             IsCorrect = HardQ.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
@@ -210,9 +220,10 @@ public class GameInstance
                 System.Console.WriteLine("Congratulations! You have WON the Hard Jeopardy Quiz!");
             }
             Console.ReadLine();
-            HardQ = null;
+
         }
     }
+    //ger valet av om spelaren vill ha fågan, om de vill ha det retunaras null så kommer en ny fråga
     private Quiz ChoseNormalQuestion(Quiz q)
     {
         bool MadeChoice = false;
@@ -246,8 +257,73 @@ public class GameInstance
         }
         return q;
     }
+    private bool NormalQuizHandler(Quiz q)
+    {
+        //man kan inte ge kontroll till en "if" sats i en switch så för att få en bool behövs denna 
+        bool Result = false;
+        bool HasAnswered = false;
+        Clues HiddenAnswer = new Clues(q);
+        while (!HasAnswered)
+        {
+            //skapar meny 
+            Console.Clear();
+            q.WritePoints();
+            q.WriteQuestion();
+            HiddenAnswer.WriteHidenAnswer();
+            int i;
+            //tar input och försöker göra den till en int och sparar den 
+            HasAnswered = int.TryParse(Console.ReadLine(), out i);
+            switch (i)
+            {
+                case 1:
+                    System.Console.WriteLine("Write answer:");
+                    //gör så att spelaren lan skriva in sin gissning 
+                    string PlayerGuess = Console.ReadLine();
+                    //gämför gissningen med svaret och ger ett reslutat
+                    Result = q.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
+                    return Result;
+                case 2:
+                    HiddenAnswer.RevealLetter(q);
+                    HasAnswered = false;
+                    break;
+                case 3:
+                    //blir san så programet fortsätter och ger tillbaka falskt
+                    HasAnswered = true;
+                    System.Console.WriteLine($"{q.Answer}");
+                    Console.ReadLine();
+                    break;
+                default:
+                    System.Console.WriteLine("No choice was made, make shure to only write a letter. Press enter to continue");
+                    Console.ReadLine();
+                    HasAnswered = false;
+                    break;
+            }
+            // ser om spelaren har använt alla sina ledtrådar 
+            // eller om de har slut på poäng
+            if (HiddenAnswer.CluesLeft <= 0 || q.IsOutOfpoints())
+            {
+                System.Console.WriteLine("you have ran out of points or clues.");
+                HasAnswered = true;
+            }
 
-
+        }
+        //om spelaren valde att får svaret eller poången är slut fortsäter programet och retunerar falsk på boolen.
+        return false;
+    }
+    private void DrawStartMenuText()
+    {
+        System.Console.WriteLine("Welcome to the Jeopardy Quiz!");
+        System.Console.WriteLine("Chose game type: ");
+        System.Console.WriteLine("1. Normal mode. ");
+        System.Console.WriteLine("You get the topic and difficulty of a question and can choose to answer it or to get a diffrent question.");
+        System.Console.WriteLine("After choosing the question you can spend 50 points to unlock one letter from the answer.");
+        System.Console.WriteLine("You start with 1000 points, you gain and lose points equal to the difficulty based on if you answer correctly. ");
+        System.Console.WriteLine("You win at 2300 points ");
+        System.Console.WriteLine("2. Hard mode. ");
+        System.Console.WriteLine("For those who are Jeopardy kings. You get random questions and no hints. You start with 1000 points.");
+        System.Console.WriteLine("However you gain or lose only half the points of the difficulty.");
+        System.Console.WriteLine("You win at 2000 points ");
+    }
     private void FullStop()
     {
         System.Console.WriteLine("Press enter to continue");
