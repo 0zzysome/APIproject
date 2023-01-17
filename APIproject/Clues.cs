@@ -57,7 +57,6 @@ public class Clues : Quiz
         System.Console.WriteLine($"Hints Left: {CluesLeft}");
         System.Console.WriteLine($"Hint of answer: {HiddenHint}");
     }
-    
     public override void RemovePoints()
     {
         TotalPoints -= 50;

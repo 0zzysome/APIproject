@@ -10,7 +10,7 @@ public class GameInstance
     RestRequest QuizRequest = new("random");
     //boolean hanterar om spelet ska avlutas.
     private bool GameIsGoing = true;
-
+    //hanterar om spelaren har gjort sit val av gamemode
     private bool HasGameType = false;
     public int GameType = 3;
     // startmeny
@@ -43,7 +43,7 @@ public class GameInstance
             }
             else
             {
-                System.Console.WriteLine("Make shure to write a letter from the menu.");
+                System.Console.WriteLine("Make sure to write a letter from the menu.");
                 FullStop();
                 HasGameType = false;
             }
@@ -80,59 +80,7 @@ public class GameInstance
 
             // när använaren har valt fråga så körs detta 
             bool Result = NormalQuizHandler(q);
-            /*
-            bool Result = false;
-            bool HasAnswered = false;
-            Clues HiddenAnswer = new Clues(q);
-            while (!HasAnswered)
-            {
-                //skapar meny 
-                Console.Clear();
-                q.WritePoints();
-                q.WriteQuestion();
-                HiddenAnswer.WriteHidenAnswer();
-                int i;
-                //tar input och försöker göra den till en int och sparar den 
-                HasAnswered = int.TryParse(Console.ReadLine(), out i);
-                switch (i)
-                {
-                    case 1:
-                        System.Console.WriteLine("Write answer:");
-                        //gör så att spelaren lan skriva in sin gissning 
-                        string PlayerGuess = Console.ReadLine();
-                        //gämför gissningen med svaret och ger ett reslutat
-                        Result = q.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
-                        break;
-                    case 2:
-                        HiddenAnswer.RevealLetter(q);
-                        HasAnswered = false;
-                        break;
-                    case 3:
-                        //blir san så programet fortsätter 
-                        HasAnswered = true;
-                        // ser till att programet markerar svaret som fel då spelaren inte svarade
-                        Result = false;
-                        System.Console.WriteLine($"{q.Answer}");
-                        Console.ReadLine();
-                        break;
-                    default:
-                        System.Console.WriteLine("No choice was made, make shure to only write a letter. Press enter to continue");
-                        Console.ReadLine();
-                        HasAnswered = false;
-                        break;
-                }
-                // ser om spelaren har använt alla sina ledtrådar 
-                // eller om de har slut på poäng
-                if (HiddenAnswer.CluesLeft <= 0 || q.IsOutOfpoints())
-                {
-                    System.Console.WriteLine("you have ran out of points or clues.");
-
-                    HasAnswered = true;
-                    Result = false;
-                }
-
-            }
-            */
+            
 
             if (Result)
             {
@@ -249,7 +197,7 @@ public class GameInstance
                     break;
                 default:
                     // om inputen var fel så körs denna och låter användaren göra ett nytt val
-                    System.Console.WriteLine("No choice was made, make shure to only write a letter. Press enter to continue");
+                    System.Console.WriteLine("No choice was made, make sure to only write a number in the list. Press enter to continue");
                     Console.ReadLine();
                     MadeChoice = false;
                     break;
@@ -293,7 +241,7 @@ public class GameInstance
                     Console.ReadLine();
                     break;
                 default:
-                    System.Console.WriteLine("No choice was made, make shure to only write a letter. Press enter to continue");
+                    System.Console.WriteLine("No choice was made, make sure to only write a number. Press enter to continue");
                     Console.ReadLine();
                     HasAnswered = false;
                     break;
