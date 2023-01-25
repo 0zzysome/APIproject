@@ -27,7 +27,7 @@ public class GameInstance
             //btw jag vet att koden är dålig men den funkar
             if (GameType == 1)
             {
-                //lägg till: vilen de valde
+                
                 System.Console.WriteLine("You chose: Normal mode");
                 FullStop();
                 HasGameType = true;
@@ -35,7 +35,7 @@ public class GameInstance
             }
             else if (GameType == 2)
             {
-                //lägg till: vilen de valde
+                
                 System.Console.WriteLine("You chose: Hard mode");
                 FullStop();
                 HasGameType = true;

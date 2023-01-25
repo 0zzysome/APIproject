@@ -43,8 +43,7 @@ public class HardQuiz : PointGiver
         System.Console.WriteLine($"{Question}");
         System.Console.WriteLine($"-------------------------------------- ");
         System.Console.WriteLine("What is the answer? Press enter to submit answer.");
-        //Lägg till: ta bort detta 
-        System.Console.WriteLine($"Answer: {Answer}");
+        
     }
     public override bool HasWonGame()
     {
