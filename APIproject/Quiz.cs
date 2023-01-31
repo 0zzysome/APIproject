@@ -4,46 +4,46 @@ public class Quiz : PointGiver
 {
     
     [JsonPropertyName("question")]
-    public string Question { get; set; }
+    public string question { get; set; }
 
     [JsonPropertyName("value")]
-    public int Difficulty { get; set; }
+    public int difficulty { get; set; }
 
     [JsonPropertyName("category_id")]
-    public int CategoryId { get; set; }
+    public int categoryId { get; set; }
 
     [JsonPropertyName("answer")]
-    public string Answer { get; set; }
+    public string answer { get; set; }
 
     [JsonPropertyName("category")]
-    public Category Category {get; set;}
+    public Category category {get; set;}
     
-    protected Random Generator = new();
+    protected Random generator = new();
     
     public void CleanAnswer()
     {
-        Answer = Answer.Replace("<i>", "");
-        Answer = Answer.Replace("</i>", "");
-        Answer = Answer.Replace("\"", "");
-        Answer = Answer.Replace("\\", "");
+        answer = answer.Replace("<i>", "");
+        answer = answer.Replace("</i>", "");
+        answer = answer.Replace("\"", "");
+        answer = answer.Replace("\\", "");
     }
     
 
     public override void AddPoints()
     {
-        TotalPoints += Difficulty;
+        totalPoints += difficulty;
     }
     public override void RemovePoints()
     {
-        TotalPoints -= Difficulty;
+        totalPoints -= difficulty;
     }
 
 
     public void WriteQuestion()
     {
-        System.Console.WriteLine($" Category: {Category.Title} || Difficulty: {Difficulty}");
+        System.Console.WriteLine($" Category: {category.title} || Difficulty: {difficulty}");
         System.Console.WriteLine($"-------------------------------------- ");
-        System.Console.WriteLine($"{Question}");
+        System.Console.WriteLine($"{question}");
         System.Console.WriteLine($"-------------------------------------- ");
         System.Console.WriteLine("What do you whant to do?");
         System.Console.WriteLine("1. Answer question");
@@ -52,15 +52,15 @@ public class Quiz : PointGiver
     }
     public void Menu()
     {
-        System.Console.WriteLine($" Category: {Category.Title}");
-        System.Console.WriteLine($" Difficulty: {Difficulty}");
+        System.Console.WriteLine($" Category: {category.title}");
+        System.Console.WriteLine($" Difficulty: {difficulty}");
         System.Console.WriteLine("Do you whant to answer the question?");
         System.Console.WriteLine("1. Yes, give me the question.");
         System.Console.WriteLine("2. No, give me a diffrent question.");
     }
     public override bool HasWonGame()
     {
-        if(PointGiver.TotalPoints>=2300)
+        if(PointGiver.totalPoints>=2300)
         {
             return true;
         }

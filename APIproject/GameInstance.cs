@@ -5,47 +5,47 @@ using System.Net;
 
 public class GameInstance
 {
-    RestClient QuizClient = new("https://jservice.io/api/");
+    RestClient quizClient = new("https://jservice.io/api/");
 
-    RestRequest QuizRequest = new("random");
+    RestRequest quizRequest = new("random");
     //boolean hanterar om spelet ska avlutas.
-    private bool GameIsGoing = true;
+    private bool gameIsGoing = true;
     //hanterar om spelaren har gjort sit val av gamemode
-    private bool HasGameType = false;
-    public int GameType = 3;
+    private bool hasGameType = false;
+    public int gameType = 3;
     // startmeny
     public void ShowStartMenu()
     {
-        while (!HasGameType)
+        while (!hasGameType)
         {
 
             Console.Clear();
             // lägg till: mindre kod 
             DrawStartMenuText();
-            HasGameType = int.TryParse(Console.ReadLine(), out GameType);
+            hasGameType = int.TryParse(Console.ReadLine(), out gameType);
             //om spelaren valde 1 eller 2 så ändras inte hasGameType och koden fortsätter.
             //btw jag vet att koden är dålig men den funkar
-            if (GameType == 1)
+            if (gameType == 1)
             {
                 
                 System.Console.WriteLine("You chose: Normal mode");
                 FullStop();
-                HasGameType = true;
+                hasGameType = true;
 
             }
-            else if (GameType == 2)
+            else if (gameType == 2)
             {
                 
                 System.Console.WriteLine("You chose: Hard mode");
                 FullStop();
-                HasGameType = true;
+                hasGameType = true;
 
             }
             else
             {
                 System.Console.WriteLine("Make sure to write a letter from the menu.");
                 FullStop();
-                HasGameType = false;
+                hasGameType = false;
             }
 
         }
@@ -54,17 +54,17 @@ public class GameInstance
     public void StartNormalQuiz()
     {
         Quiz q = null;
-        while (GameIsGoing)
+        while (gameIsGoing)
         {
             while (q == null)
             {
-                RestResponse QuizResponse = QuizClient.GetAsync(QuizRequest).Result;
+                RestResponse quizResponse = quizClient.GetAsync(quizRequest).Result;
                 // ser till så att inga fel upstod när den hämta data
-                if (QuizResponse.StatusCode == HttpStatusCode.OK)
+                if (quizResponse.StatusCode == HttpStatusCode.OK)
                 {
                     Console.Clear();
                     //skapar frågan
-                    q = JsonSerializer.Deserialize<List<Quiz>>(QuizResponse.Content).First();
+                    q = JsonSerializer.Deserialize<List<Quiz>>(quizResponse.Content).First();
                     // tar bort tecken som inte behövs i frågan
                     q.CleanAnswer();
 
@@ -79,30 +79,30 @@ public class GameInstance
             }
 
             // när använaren har valt fråga så körs detta 
-            bool Result = NormalQuizHandler(q);
+            bool result = NormalQuizHandler(q);
             
 
-            if (Result)
+            if (result)
             {
-                System.Console.WriteLine($"CORRECT! You gained {q.Difficulty} points!");
+                System.Console.WriteLine($"CORRECT! You gained {q.difficulty} points!");
                 q.AddPoints();
             }
             else
             {
                 q.RemovePoints();
-                System.Console.WriteLine($"WRONG! You lost {q.Difficulty} points");
-                System.Console.WriteLine($"Correct answer: {q.Answer}");
+                System.Console.WriteLine($"WRONG! You lost {q.difficulty} points");
+                System.Console.WriteLine($"Correct answer: {q.answer}");
             }
             //kollar om spelaren har poäng kvar och avlsutar while satsen om det har slut på poäng
             if (q.IsOutOfpoints())
             {
-                GameIsGoing = false;
+                gameIsGoing = false;
                 System.Console.WriteLine("You have LOST the Normal Jeopardy Quiz!");
             }
             //kollar om spelaren har tillråklig med poäng för att vinna
             if (q.HasWonGame())
             {
-                GameIsGoing = false;
+                gameIsGoing = false;
                 System.Console.WriteLine("Congratulations! You have WON the Normal Jeopardy Quiz!");
             }
             q.WritePoints();
@@ -114,22 +114,22 @@ public class GameInstance
     //svår frågesport
     public void StartHardQuiz()
     {
-        HardQuiz HardQ = new HardQuiz();
+        HardQuiz hardQ = new HardQuiz();
         //kör spelet medans spelaren har poäng kvar.
-        while (!HardQ.IsOutOfpoints() && !HardQ.HasWonGame())
+        while (!hardQ.IsOutOfpoints() && !hardQ.HasWonGame())
         {
             
-            HardQ = null;
-            while (HardQ == null)
+            hardQ = null;
+            while (hardQ == null)
             {
 
                 //hämtar en respons från api 
-                RestResponse QuizResponse = QuizClient.GetAsync(QuizRequest).Result;
+                RestResponse quizResponse = quizClient.GetAsync(quizRequest).Result;
                 
                 //sparar värderna från responsen i variabeln
                 try
                 {
-                    HardQ = JsonSerializer.Deserialize<List<HardQuiz>>(QuizResponse.Content).First();
+                    hardQ = JsonSerializer.Deserialize<List<HardQuiz>>(quizResponse.Content).First();
                 }
                 catch (Exception ex)
                 {
@@ -137,34 +137,34 @@ public class GameInstance
                 }
             }
             Console.Clear();
-            HardQ.CleanAnswer();
+            hardQ.CleanAnswer();
             //skriver ut meny
-            HardQ.WritePoints();
-            HardQ.WriteQuestion();
-            bool IsCorrect = false;
+            hardQ.WritePoints();
+            hardQ.WriteQuestion();
+            bool isCorrect = false;
             //spelaren svarar
-            string PlayerGuess = Console.ReadLine();
+            string playerGuess = Console.ReadLine();
             // svaret gämförs och sparas i en boolean
-            IsCorrect = HardQ.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
-            if (IsCorrect)
+            isCorrect = hardQ.answer.Equals(playerGuess, StringComparison.OrdinalIgnoreCase);
+            if (isCorrect)
             {
-                System.Console.WriteLine($"CORRECT! You gained {HardQ.Difficulty / 2} points!");
-                HardQ.AddPoints();
+                System.Console.WriteLine($"CORRECT! You gained {hardQ.difficulty / 2} points!");
+                hardQ.AddPoints();
             }
             else
             {
-                System.Console.WriteLine($"WRONG! You lost {HardQ.Difficulty / 2} points");
-                System.Console.WriteLine($"Correct answer: {HardQ.Answer}");
-                HardQ.RemovePoints();
+                System.Console.WriteLine($"WRONG! You lost {hardQ.difficulty / 2} points");
+                System.Console.WriteLine($"Correct answer: {hardQ.answer}");
+                hardQ.RemovePoints();
             }
-            if (HardQ.IsOutOfpoints())
+            if (hardQ.IsOutOfpoints())
             {
-                GameIsGoing = false;
+                gameIsGoing = false;
                 System.Console.WriteLine("You have LOST the Hard Jeopardy Quiz!");
             }
-            if (HardQ.HasWonGame())
+            if (hardQ.HasWonGame())
             {
-                GameIsGoing = false;
+                gameIsGoing = false;
                 System.Console.WriteLine("Congratulations! You have WON the Hard Jeopardy Quiz!");
             }
             Console.ReadLine();
@@ -174,10 +174,10 @@ public class GameInstance
     //ger valet av om spelaren vill ha fågan, om de vill ha det retunaras null så kommer en ny fråga
     private Quiz ChoseNormalQuestion(Quiz q)
     {
-        bool MadeChoice = false;
-        int Choice;
+        bool madeChoice = false;
+        int choice;
         //körs medans spelaren inte har valt
-        while (!MadeChoice)
+        while (!madeChoice)
         {
             Console.Clear();
             // ritar ut texten
@@ -185,8 +185,8 @@ public class GameInstance
             q.WritePoints();
             q.Menu();
             //tar input och gör till en int 
-            MadeChoice = int.TryParse(Console.ReadLine(), out Choice);
-            switch (Choice)
+            madeChoice = int.TryParse(Console.ReadLine(), out choice);
+            switch (choice)
             {
                 case 1:
                     //fortsäter och skriver ut frågan
@@ -199,7 +199,7 @@ public class GameInstance
                     // om inputen var fel så körs denna och låter användaren göra ett nytt val
                     System.Console.WriteLine("No choice was made, make sure to only write a number in the list. Press enter to continue");
                     Console.ReadLine();
-                    MadeChoice = false;
+                    madeChoice = false;
                     break;
             }
         }
@@ -208,50 +208,50 @@ public class GameInstance
     private bool NormalQuizHandler(Quiz q)
     {
         //man kan inte ge kontroll till en "if" sats i en switch så för att få en bool behövs denna 
-        bool Result = false;
-        bool HasAnswered = false;
-        Clues HiddenAnswer = new Clues(q);
-        while (!HasAnswered)
+        bool result = false;
+        bool hasAnswered = false;
+        Clues hiddenAnswer = new Clues(q);
+        while (!hasAnswered)
         {
             //skapar meny 
             Console.Clear();
             q.WritePoints();
             q.WriteQuestion();
-            HiddenAnswer.WriteHidenAnswer();
+            hiddenAnswer.WriteHidenAnswer();
             int i;
             //tar input och försöker göra den till en int och sparar den 
-            HasAnswered = int.TryParse(Console.ReadLine(), out i);
+            hasAnswered = int.TryParse(Console.ReadLine(), out i);
             switch (i)
             {
                 case 1:
                     System.Console.WriteLine("Write answer:");
                     //gör så att spelaren lan skriva in sin gissning 
-                    string PlayerGuess = Console.ReadLine();
+                    string playerGuess = Console.ReadLine();
                     //gämför gissningen med svaret och ger ett reslutat
-                    Result = q.Answer.Equals(PlayerGuess, StringComparison.OrdinalIgnoreCase);
-                    return Result;
+                    result = q.answer.Equals(playerGuess, StringComparison.OrdinalIgnoreCase);
+                    return result;
                 case 2:
-                    HiddenAnswer.RevealLetter(q);
-                    HasAnswered = false;
+                    hiddenAnswer.RevealLetter(q);
+                    hasAnswered = false;
                     break;
                 case 3:
                     //blir san så programet fortsätter och ger tillbaka falskt
-                    HasAnswered = true;
-                    System.Console.WriteLine($"{q.Answer}");
+                    hasAnswered = true;
+                    System.Console.WriteLine($"{q.answer}");
                     Console.ReadLine();
                     break;
                 default:
                     System.Console.WriteLine("No choice was made, make sure to only write a number. Press enter to continue");
                     Console.ReadLine();
-                    HasAnswered = false;
+                    hasAnswered = false;
                     break;
             }
             // ser om spelaren har använt alla sina ledtrådar 
             // eller om de har slut på poäng
-            if (HiddenAnswer.CluesLeft <= 0 || q.IsOutOfpoints())
+            if (hiddenAnswer.cluesLeft <= 0 || q.IsOutOfpoints())
             {
                 System.Console.WriteLine("you have ran out of points or clues.");
-                HasAnswered = true;
+                hasAnswered = true;
             }
 
         }

@@ -4,6 +4,6 @@ public class Category
 {
     
     [JsonPropertyName("title")]
-    public string Title { get; set; }
+    public string title { get; set; }
     
 }

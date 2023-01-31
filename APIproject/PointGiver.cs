@@ -4,25 +4,25 @@ using System;
 
 public class PointGiver
 {
-    public static int TotalPoints { get; set; }= 1000;
+    public static int totalPoints { get; set; }= 1000;
     
     public virtual void AddPoints()
     {
-        TotalPoints += 100;
+        totalPoints += 100;
     }
     public virtual void RemovePoints()
     {
-        TotalPoints += 100;
+        totalPoints += 100;
     }
     public void WritePoints()
     {
-        System.Console.WriteLine($" Points left: {PointGiver.TotalPoints}");
+        System.Console.WriteLine($" Points left: {PointGiver.totalPoints}");
         System.Console.WriteLine($"-------------------------------------- ");
     }
 
     public bool IsOutOfpoints()
     {
-        if(PointGiver.TotalPoints<= 0)
+        if(PointGiver.totalPoints<= 0)
         {
             return true;
         }
@@ -35,7 +35,7 @@ public class PointGiver
     public virtual bool HasWonGame()
     {
         //normal quiz
-        if(PointGiver.TotalPoints>=2300)
+        if(PointGiver.totalPoints>=2300)
         {
             return true;
         }

@@ -2,16 +2,16 @@
 using System.Text.Json;
 using System.Net;
 
-GameInstance Game = new GameInstance();
+GameInstance game = new GameInstance();
 
-Game.ShowStartMenu();
-if(Game.GameType==1)
+game.ShowStartMenu();
+if(game.gameType==1)
 {
-    Game.StartNormalQuiz();
+    game.StartNormalQuiz();
 }
-else if(Game.GameType==2)
+else if(game.gameType==2)
 {
-    Game.StartHardQuiz();
+    game.StartHardQuiz();
 }
 else
 {

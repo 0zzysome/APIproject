@@ -5,25 +5,25 @@ public class Clues : Quiz
 
     // ska få tag i svaret och skapa sin egna hint som har alla bokstäver utkrysna
     // spelaren kan sen välja att visa en boktav i taget
-    public string HiddenHint { get; set; } = "";
-    public int CluesLeft { get; set; } = 0;
+    public string hiddenHint { get; set; } = "";
+    public int cluesLeft { get; set; } = 0;
     public Clues(Quiz q)
     {
         
         //konverterar svaret till ett hemligt svar
-        for (var i = 0; i < q.Answer.Length; i++)
+        for (var i = 0; i < q.answer.Length; i++)
         {
             
             
-            if (q.Answer[i] != ' ')
+            if (q.answer[i] != ' ')
             {
-                HiddenHint += "-";
-                CluesLeft += 1;
+                hiddenHint += "-";
+                cluesLeft += 1;
             }
             //gör så alla mellanslag inte räknas som gömda bokstäver
             else
             {
-                HiddenHint += ' ';   
+                hiddenHint += ' ';   
             }
             
             
@@ -33,20 +33,20 @@ public class Clues : Quiz
     }
     public void RevealLetter(Quiz q)
     {
-        bool NotRevealed = true;
+        bool notRevealed = true;
         //körs tills en ny slupad bokstav har visats
-        while(NotRevealed)
+        while(notRevealed)
         {
-            char[] ca = HiddenHint.ToArray();
-            char[] AnswerChar = q.Answer.ToArray();
-            int p = Generator.Next(0, q.Answer.Length);
+            char[] ca = hiddenHint.ToArray();
+            char[] answerChar = q.answer.ToArray();
+            int p = generator.Next(0, q.answer.Length);
             if(ca[p]=='-')
             {
-                ca[p] = AnswerChar[p];
-                HiddenHint = string.Join("", ca);
-                CluesLeft -= 1; 
+                ca[p] = answerChar[p];
+                hiddenHint = string.Join("", ca);
+                cluesLeft -= 1; 
                 RemovePoints();
-                NotRevealed = false;
+                notRevealed = false;
             }
         }
         
@@ -54,12 +54,12 @@ public class Clues : Quiz
     }
     public void WriteHidenAnswer()
     {
-        System.Console.WriteLine($"Hints Left: {CluesLeft}");
-        System.Console.WriteLine($"Hint of answer: {HiddenHint}");
+        System.Console.WriteLine($"Hints Left: {cluesLeft}");
+        System.Console.WriteLine($"Hint of answer: {hiddenHint}");
     }
     public override void RemovePoints()
     {
-        TotalPoints -= 50;
+        totalPoints -= 50;
     }
     
 }

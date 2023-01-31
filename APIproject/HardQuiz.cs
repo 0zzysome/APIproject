@@ -9,45 +9,45 @@ public class HardQuiz : PointGiver
     // men man får inga tips och man får inte välja frågor
     // får man 2000 poäng vinner man (kanske vara på andra också)
     [JsonPropertyName("question")]
-    public string Question { get; set; }
+    public string question { get; set; }
 
     [JsonPropertyName("value")]
-    public int Difficulty { get; set; }
+    public int difficulty { get; set; }
 
     [JsonPropertyName("answer")]
-    public string Answer { get; set; }
+    public string answer { get; set; }
 
     [JsonPropertyName("category")]
-    public Category Category {get; set;}
+    public Category category {get; set;}
     
     public void CleanAnswer()
     {
-        Answer = Answer.Replace("<i>", "");
-        Answer = Answer.Replace("</i>", "");
-        Answer = Answer.Replace("\"", "");
-        Answer = Answer.Replace("\\", "");
+        answer = answer.Replace("<i>", "");
+        answer = answer.Replace("</i>", "");
+        answer = answer.Replace("\"", "");
+        answer = answer.Replace("\\", "");
     }
 
     public override void RemovePoints()
     {
-        TotalPoints -= Difficulty/2;
+        totalPoints -= difficulty/2;
     } 
     public override void AddPoints()
     {
-        TotalPoints += Difficulty/2;
+        totalPoints += difficulty/2;
     }
     public void WriteQuestion()
     {
-        System.Console.WriteLine($" Category: {Category.Title} || Difficulty: {Difficulty}");
+        System.Console.WriteLine($" Category: {category.title} || Difficulty: {difficulty}");
         System.Console.WriteLine($"-------------------------------------- ");
-        System.Console.WriteLine($"{Question}");
+        System.Console.WriteLine($"{question}");
         System.Console.WriteLine($"-------------------------------------- ");
         System.Console.WriteLine("What is the answer? Press enter to submit answer.");
         
     }
     public override bool HasWonGame()
     {
-        if(PointGiver.TotalPoints>=2000)
+        if(PointGiver.totalPoints>=2000)
         {
             return true;
         }
